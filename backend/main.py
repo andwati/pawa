@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import os
 import fitz  # PyMuPDF
-import openai
+import openai  # Correct OpenAI library
 
 load_dotenv()
 
@@ -48,14 +48,17 @@ async def upload_document(
     """
 
     try:
-        # Send the prompt to OpenAI's API
-        response = openai.Completion.create(
-            engine="text-davinci-003",  # Use a free-tier engine if available
-            prompt=prompt,
+        # Send the prompt to OpenAI's ChatCompletion API
+        response = openai.ChatCompletion.create(
+            model="davinci-002",  # Use the ChatGPT model
+            messages=[
+                {"role": "system", "content": "You are a legal assistant."},
+                {"role": "user", "content": prompt}
+            ],
             max_tokens=500,
             temperature=0.7
         )
-        result = response.choices[0].text.strip()
+        result = response['choices'][0]['message']['content'].strip()
 
         return {"summary": result}
 
